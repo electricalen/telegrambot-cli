@@ -1,0 +1,28 @@
+[project]
+name = "telegrambot-cli"
+version = "0.2.0"
+description = "Reusable owner-only Telegram bot with message CLI commands and JobQueue monitors (python-telegram-bot)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "You" }]
+
+dependencies = [
+  "python-telegram-bot[job-queue]>=21,<22",
+  "pydantic>=2.6,<3",
+  "pydantic-settings>=2.2,<3",
+  "tzdata>=2024.1",
+]
+
+[project.scripts]
+telegrambot-cli = "telegrambot_cli.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/telegrambot"
+
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["telegrambot_cli"]
