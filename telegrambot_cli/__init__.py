@@ -21,13 +21,21 @@ from telegrambot_cli.commands.registry import (
 )
 from telegrambot_cli.config import Settings, load_settings
 from telegrambot_cli.monitoring.monitors import register_monitor
-from telegrambot_cli.runner import run_bot
+from telegrambot_cli.runner import (
+    build_application,
+    configure_application,
+    prepare_runtime,
+    run_bot,
+)
 
 __all__ = [
     "CommandRegistry",
     "Settings",
     "build_registry",
+    "build_application",
+    "configure_application",
     "load_settings",
+    "prepare_runtime",
     "register_decorated",
     "register_monitor",
     "run_bot",

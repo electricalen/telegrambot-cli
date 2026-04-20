@@ -13,6 +13,29 @@ It is built on [python-telegram-bot](https://github.com/python-telegram-bot/pyth
 Distribution name: `telegrambot-cli`  
 Import package: `telegrambot_cli`
 
+## Install
+
+Use the library directly from GitHub:
+
+```bash
+pip install "git+https://github.com/electricalen/telegrambot.git"
+```
+
+With `uv`, add it as a Git dependency:
+
+```toml
+dependencies = ["telegrambot-cli"]
+
+[tool.uv.sources]
+telegrambot-cli = { git = "https://github.com/electricalen/telegrambot.git" }
+```
+
+For local development against this repository:
+
+```bash
+uv sync --group dev
+```
+
 ## What It Looks Like
 
 Message the bot as an allowed owner:
@@ -50,13 +73,7 @@ def register(registry: CommandRegistry) -> None:
 
 ## Quick Start
 
-Install the repo locally with `uv`:
-
-```bash
-uv sync
-```
-
-Create a `.env` file from the example:
+Create a `.env` file:
 
 ```bash
 cp .env.example .env
@@ -65,7 +82,7 @@ cp .env.example .env
 Run the library directly:
 
 ```bash
-uv run telegrambot-cli
+telegrambot-cli
 ```
 
 Run the example app:
@@ -97,6 +114,72 @@ if __name__ == "__main__":
 ```
 
 By default, `run_bot()` loads settings from `Path.cwd() / ".env"`. You can also set `TELEGRAM_ENV_FILE` or pass `settings=load_settings(...)` directly.
+
+## Integration Modes
+
+The library supports three adoption levels:
+
+1. `run_bot(...)`
+   The highest-level entrypoint. Use this when the library should own PTB setup and polling.
+2. `build_application(...)`
+   Builds a PTB `Application` with the framework wired in, but does not start polling.
+3. `prepare_runtime(...)` + `configure_application(...)`
+   Use these when your project already owns PTB builder configuration, persistence, webhook setup, or lifecycle management.
+
+### Greenfield Bot
+
+Use `run_bot(...)` if you want the library to manage everything:
+
+```python
+from telegrambot_cli import run_bot
+
+
+run_bot(
+    plugin_package="myapp.plugins",
+    pre_import_modules=("myapp.monitors",),
+)
+```
+
+### Custom PTB Builder
+
+Use `build_application(...)` when you need PTB customization before the app is started:
+
+```python
+from telegram.ext import PicklePersistence
+
+from telegrambot_cli import build_application
+
+
+application = build_application(
+    plugin_package="myapp.plugins",
+    pre_import_modules=("myapp.monitors",),
+    configure_builder=lambda builder: builder.persistence(
+        PicklePersistence(filepath="bot-data.pkl")
+    ),
+)
+
+application.run_polling()
+```
+
+### Existing PTB Application
+
+Use `prepare_runtime(...)` and `configure_application(...)` when your project already creates the PTB app:
+
+```python
+from telegram.ext import Application
+
+from telegrambot_cli import configure_application, prepare_runtime
+
+
+settings, registry = prepare_runtime(
+    plugin_package="myapp.plugins",
+    pre_import_modules=("myapp.monitors",),
+)
+
+application = Application.builder().token(settings.bot_token).build()
+configure_application(application, settings=settings, registry=registry)
+application.run_polling(timeout=settings.polling_timeout_sec)
+```
 
 ## Architecture
 
@@ -152,6 +235,25 @@ async def tick(context) -> None:
 
 Import monitor modules through `pre_import_modules` so decorators run before job scheduling begins.
 
+### Inline Commands
+
+For small projects, commands can be registered without a plugin package:
+
+```python
+from telegrambot_cli import CommandRegistry, run_bot, register_decorated, telegram_command
+
+
+def register_commands(registry: CommandRegistry) -> None:
+    @telegram_command(name="ping", help="Health check.")
+    def ping() -> str:
+        return "pong"
+
+    register_decorated(registry, ping)
+
+
+run_bot(register_commands=register_commands)
+```
+
 ## Configuration
 
 Key environment variables:
@@ -167,6 +269,39 @@ Key environment variables:
 | `TELEGRAM_LOG_LEVEL` | Standard Python logging level |
 
 Settings are modeled with Pydantic and normalized on load, which keeps validation close to startup instead of failing later in message handling.
+
+## Public API
+
+### `run_bot(...)`
+
+High-level entrypoint that builds a PTB application and starts long polling.
+
+Arguments:
+
+| Parameter | Purpose |
+| --- | --- |
+| `settings` | Pre-built `Settings` instance. Defaults to `load_settings()`. |
+| `register_commands` | Optional callback for inline command registration. |
+| `plugin_package` | String package name or imported module containing command plugins. |
+| `pre_import_modules` | Modules imported before scheduling jobs, usually to trigger `@register_monitor`. |
+| `include_builtin_commands` | Enables built-in `help` and `commands`. |
+| `builder` | Optional PTB `ApplicationBuilder` instance. |
+| `configure_builder` | Optional callback to customize the PTB builder before `build()`. |
+| `configure_logging` | Enables library logging setup from `Settings.log_level`. |
+| `add_default_handlers` | Adds the owner-only text command handler. |
+| `enable_jobs` | Schedules heartbeat and registered monitors. |
+
+### `build_application(...)`
+
+Builds and configures a PTB `Application`, but leaves lifecycle control to the caller.
+
+### `prepare_runtime(...)`
+
+Loads settings, imports monitor modules, and creates the `CommandRegistry`.
+
+### `configure_application(...)`
+
+Attaches telegrambot-cli state, handlers, and jobs to an existing PTB `Application`.
 
 ## Development
 

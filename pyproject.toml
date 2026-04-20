@@ -28,6 +28,12 @@ dependencies = [
 [project.scripts]
 telegrambot-cli = "telegrambot_cli.__main__:main"
 
+[project.urls]
+Homepage = "https://github.com/electricalen/telegrambot"
+Documentation = "https://github.com/electricalen/telegrambot#readme"
+Issues = "https://github.com/electricalen/telegrambot/issues"
+Source = "https://github.com/electricalen/telegrambot"
+
 [build-system]
 requires = ["hatchling>=1.18"]
 build-backend = "hatchling.build"

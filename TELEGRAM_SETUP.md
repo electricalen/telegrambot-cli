@@ -51,12 +51,18 @@ Optional alternate env file:
 
 ## 4. Use As A Library
 
-Install from PyPI when published, or use a path dependency during local development:
+Install directly from the public GitHub repository:
+
+```bash
+pip install "git+https://github.com/electricalen/telegrambot.git"
+```
+
+Or with `uv`:
 
 ```toml
 dependencies = ["telegrambot-cli"]
 [tool.uv.sources]
-telegrambot-cli = { path = "/path/to/telegrambot", editable = true }
+telegrambot-cli = { git = "https://github.com/electricalen/telegrambot.git" }
 ```
 
 **Minimal app:**
@@ -72,6 +78,25 @@ run_bot(
 
 - Built-in `help` and `commands` are registered unless you pass `include_builtin_commands=False`.
 - Put one command per module under `myapp/plugins/` with `def register(registry): ...`.
+
+### Integrate Into An Existing PTB App
+
+If your project already creates the PTB application, use the lower-level API:
+
+```python
+from telegram.ext import Application
+
+from telegrambot_cli import configure_application, prepare_runtime
+
+settings, registry = prepare_runtime(
+    plugin_package="myapp.plugins",
+    pre_import_modules=("myapp.monitors",),
+)
+
+application = Application.builder().token(settings.bot_token).build()
+configure_application(application, settings=settings, registry=registry)
+application.run_polling(timeout=settings.polling_timeout_sec)
+```
 
 ## 5. Run From This Repo
 
