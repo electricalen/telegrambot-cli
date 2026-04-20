@@ -5,6 +5,9 @@ description = "Extensible owner-only Telegram bot framework with CLI-style comma
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
+authors = [
+  { name = "telegrambot-cli contributors" },
+]
 keywords = ["telegram", "bot", "python-telegram-bot", "cli", "automation"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -42,9 +45,16 @@ build-backend = "hatchling.build"
 dev = [
   "pytest>=8,<9",
 ]
+release = [
+  "build>=1.2,<2",
+  "twine>=6,<7",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["telegrambot_cli"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"telegrambot_cli/py.typed" = "telegrambot_cli/py.typed"

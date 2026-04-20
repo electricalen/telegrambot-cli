@@ -15,7 +15,19 @@ Import package: `telegrambot_cli`
 
 ## Install
 
-Use the library directly from GitHub:
+Install from PyPI:
+
+```bash
+pip install telegrambot-cli
+```
+
+With `uv`:
+
+```bash
+uv add telegrambot-cli
+```
+
+Use GitHub only if you need an unreleased revision:
 
 ```bash
 pip install "git+https://github.com/electricalen/telegrambot.git"
@@ -34,6 +46,14 @@ For local development against this repository:
 
 ```bash
 uv sync --group dev
+```
+
+For release checks:
+
+```bash
+uv sync --group dev --group release
+uv run python -m build
+uv run twine check dist/*
 ```
 
 ## What It Looks Like
@@ -95,6 +115,26 @@ uv run sample-telegram-bot
 ```
 
 Detailed bot setup, configuration, and troubleshooting live in [TELEGRAM_SETUP.md](TELEGRAM_SETUP.md).
+
+## Publishing
+
+Releases are intended to be published with GitHub Actions Trusted Publishing:
+
+- `test.yml` runs the test suite on pushes and pull requests.
+- tags matching `v*` publish to PyPI
+- manual runs can publish to TestPyPI
+- `release.yml` builds distributions, validates them with `twine check`, and publishes to the selected index
+
+Before the first publish, configure PyPI and TestPyPI Trusted Publishing for this repository's GitHub Actions workflow.
+
+Local release smoke test:
+
+```bash
+uv sync --group dev --group release
+uv run pytest -q
+uv run python -m build
+uv run twine check dist/*
+```
 
 ## Minimal App
 

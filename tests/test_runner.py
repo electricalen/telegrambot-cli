@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import pytest
 from telegram.ext import Application
 
 from telegrambot_cli import build_application, configure_application, prepare_runtime
+from telegrambot_cli.__main__ import main
 from telegrambot_cli.commands.registry import CommandRegistry
 from telegrambot_cli.config import Settings
 
@@ -48,3 +50,19 @@ def test_build_application_returns_configured_application() -> None:
 
     assert application.bot_data["settings"].owner_id_list == [7]
     assert application.bot_data["command_registry"].all() == []
+
+
+def test_main_prints_version_without_starting_bot(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--version"])
+
+    assert excinfo.value.code == 0
+    assert "telegrambot-cli 0.2.0" in capsys.readouterr().out
+
+
+def test_main_prints_help_without_starting_bot(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--help"])
+
+    assert excinfo.value.code == 0
+    assert "Run the telegrambot-cli bot" in capsys.readouterr().out

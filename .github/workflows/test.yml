@@ -23,7 +23,13 @@ jobs:
           python-version: "3.11"
 
       - name: Sync dependencies
-        run: uv sync --group dev
+        run: uv sync --group dev --group release
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run pytest -q
+
+      - name: Build distributions
+        run: uv run python -m build
+
+      - name: Check distributions
+        run: uv run twine check dist/*
