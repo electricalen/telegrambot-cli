@@ -54,7 +54,7 @@ Optional alternate env file:
 Install directly from the public GitHub repository:
 
 ```bash
-pip install "git+https://github.com/electricalen/telegrambot.git"
+pip install "git+https://github.com/electricalen/telegrambot-cli.git"
 ```
 
 Or with `uv`:
@@ -62,7 +62,7 @@ Or with `uv`:
 ```toml
 dependencies = ["telegrambot-cli"]
 [tool.uv.sources]
-telegrambot-cli = { git = "https://github.com/electricalen/telegrambot.git" }
+telegrambot-cli = { git = "https://github.com/electricalen/telegrambot-cli.git" }
 ```
 
 **Minimal app:**

@@ -30,7 +30,7 @@ uv add telegrambot-cli
 Use GitHub only if you need an unreleased revision:
 
 ```bash
-pip install "git+https://github.com/electricalen/telegrambot.git"
+pip install "git+https://github.com/electricalen/telegrambot-cli.git"
 ```
 
 With `uv`, add it as a Git dependency:
@@ -39,7 +39,7 @@ With `uv`, add it as a Git dependency:
 dependencies = ["telegrambot-cli"]
 
 [tool.uv.sources]
-telegrambot-cli = { git = "https://github.com/electricalen/telegrambot.git" }
+telegrambot-cli = { git = "https://github.com/electricalen/telegrambot-cli.git" }
 ```
 
 For local development against this repository:
