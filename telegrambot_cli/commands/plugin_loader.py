@@ -19,7 +19,10 @@ def load_plugins(package: ModuleType, registry: CommandRegistry) -> None:
     if not hasattr(package, "__path__"):
         raise TypeError(f"{package!r} is not a package")
 
-    for info in pkgutil.iter_modules(package.__path__, f"{package.__name__}."):
+    for info in sorted(
+        pkgutil.iter_modules(package.__path__, f"{package.__name__}."),
+        key=lambda item: item.name,
+    ):
         short_name = info.name.rpartition(".")[-1]
         if short_name.startswith("_"):
             continue

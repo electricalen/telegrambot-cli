@@ -1,8 +1,8 @@
-# Telegram bot setup and running guide
+# Telegram Bot Setup And Running Guide
 
-This repository publishes the **`telegrambot-cli`** Python library (PTB + owner-only message CLI + optional JobQueue monitors). See [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot).
+This guide covers the runtime setup for `telegrambot-cli`: creating the bot, finding the allowed owner IDs, configuring environment variables, and running either the framework itself or the bundled sample app.
 
-## 1. Create the bot in Telegram
+## 1. Create The Bot In Telegram
 
 1. Open Telegram and talk to **[@BotFather](https://t.me/BotFather)**.
 2. Send `/newbot` and follow the prompts.
@@ -10,16 +10,16 @@ This repository publishes the **`telegrambot-cli`** Python library (PTB + owner-
 
 Treat the token like a password; do not commit it to git.
 
-## 2. Find your Telegram user ID (owner)
+## 2. Find Your Telegram User ID
 
 The bot only accepts messages from users listed in `TELEGRAM_OWNER_IDS`.
 
 - Message **[@userinfobot](https://t.me/userinfobot)** and copy the numeric `Id`.
 - Use a **comma-separated list** for multiple owners, e.g. `123,456`.
 
-## 3. Configuration (`.env` file)
+## 3. Configuration
 
-The library loads **`Path.cwd() / ".env"`** by default (unless `TELEGRAM_ENV_FILE` is set or you call `load_settings(env_file=...)`).
+The library loads `Path.cwd() / ".env"` by default unless `TELEGRAM_ENV_FILE` is set or you call `load_settings(env_file=...)`.
 
 1. Copy the example from the repo root:
 
@@ -29,29 +29,29 @@ cp .env.example .env
 
 2. Edit `.env` with at least `TELEGRAM_BOT_TOKEN` and `TELEGRAM_OWNER_IDS`.
 
-Optional:
+Optional alternate env file:
 
 ```bash
  export TELEGRAM_ENV_FILE="$HOME/secrets/telegram.env"
 ```
 
-### Variable reference
+### Variable Reference
 
 | Variable | Example | Meaning |
 | --- | --- | --- |
 | `TELEGRAM_BOT_TOKEN` | `123:abc...` | From BotFather (required) |
 | `TELEGRAM_OWNER_IDS` | `123456789` or `1,2` | Allowed user id(s) (required) |
 | `TELEGRAM_ENV_FILE` | path | Alternate env file |
-| `TELEGRAM_POLLING_TIMEOUT_SEC` | `30` | Polling-related setting |
+| `TELEGRAM_POLLING_TIMEOUT_SEC` | `30` | PTB long-poll timeout |
 | `TELEGRAM_HEARTBEAT_ENABLED` | `true` | Periodic heartbeat message |
 | `TELEGRAM_HEARTBEAT_INTERVAL_SEC` | `900` | Heartbeat interval (seconds) |
 | `TELEGRAM_HEARTBEAT_MESSAGE` | `Heartbeat` | Heartbeat text |
 | `TELEGRAM_MONITOR_INTERVAL_SEC` | `120` | Custom monitor tick interval |
 | `TELEGRAM_LOG_LEVEL` | `INFO` | Logging level |
 
-## 4. Use as a library (your own project)
+## 4. Use As A Library
 
-**Install** from PyPI when published, or use a path dependency (see `examples/sample_app/pyproject.toml`):
+Install from PyPI when published, or use a path dependency during local development:
 
 ```toml
 dependencies = ["telegrambot-cli"]
@@ -70,12 +70,12 @@ run_bot(
 )
 ```
 
-- Built-in **`help`** and **`commands`** are registered unless you pass `include_builtin_commands=False`.
-- Put one command per module under `myapp/plugins/` with `def register(registry): ...` (see example app).
+- Built-in `help` and `commands` are registered unless you pass `include_builtin_commands=False`.
+- Put one command per module under `myapp/plugins/` with `def register(registry): ...`.
 
-## 5. Run from this repo
+## 5. Run From This Repo
 
-### Library only (built-in commands)
+### Library Only
 
 From repo root, `.env` in the current working directory:
 
@@ -85,7 +85,7 @@ uv run telegrambot-cli
 # or: uv run python -m telegrambot_cli
 ```
 
-### Full example (`echo` / `ping` / `time`)
+### Full Example
 
 ```bash
 cd examples/sample_app
@@ -94,18 +94,22 @@ uv sync
 uv run sample-telegram-bot
 ```
 
-## 6. Using the message CLI
+## 6. Using The Message CLI
 
-- `commands`, `help`, `help echo`, `echo hello`, `time tz=America/New_York`, etc.
+- `commands`
+- `help`
+- `help echo`
+- `echo hello`
+- `time tz=America/New_York`
 
-## 7. Adding commands (in your app)
+## 7. Adding Commands
 
 1. Create a Python **package** (e.g. `myapp/plugins/`).
 2. Add one file per command; each file defines `register(registry)` and uses `@telegram_command` + `register_decorated`.
 3. Pass `plugin_package="myapp.plugins"` to `run_bot`.
 4. Copy the pattern from `examples/sample_app/sample_app/plugins/` and `_template.py`.
 
-## 8. Adding proactive monitors
+## 8. Adding Proactive Monitors
 
 1. In your app, use `from telegrambot_cli import register_monitor`.
 2. Decorate async `async def myjob(context): ...` and call `context.bot.send_message(...)`.
@@ -116,7 +120,7 @@ See `examples/sample_app/sample_app/monitors.py` for a commented stub.
 ## 9. Troubleshooting
 
 - Bot ignores you: check `TELEGRAM_OWNER_IDS` matches your Telegram user id.
-- Monitors never run: ensure the module that calls `@register_monitor` is imported (e.g. via `pre_import_modules`).
+- Monitors never run: ensure the module that calls `@register_monitor` is imported before `run_bot()` schedules jobs.
 - JobQueue errors: install must include `python-telegram-bot[job-queue]` (already a dependency of `telegrambot-cli`).
 
 ## 10. References

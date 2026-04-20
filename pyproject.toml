@@ -1,11 +1,22 @@
 [project]
 name = "telegrambot-cli"
 version = "0.2.0"
-description = "Reusable owner-only Telegram bot with message CLI commands and JobQueue monitors (python-telegram-bot)."
+description = "Extensible owner-only Telegram bot framework with CLI-style commands and scheduled monitors."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "You" }]
+keywords = ["telegram", "bot", "python-telegram-bot", "cli", "automation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Communications :: Chat",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
 
 dependencies = [
   "python-telegram-bot[job-queue]>=21,<22",
@@ -17,12 +28,17 @@ dependencies = [
 [project.scripts]
 telegrambot-cli = "telegrambot_cli.__main__:main"
 
-[project.urls]
-Homepage = "https://github.com/your-org/telegrambot"
-
 [build-system]
 requires = ["hatchling>=1.18"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+  "pytest>=8,<9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["telegrambot_cli"]

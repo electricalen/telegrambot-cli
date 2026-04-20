@@ -63,5 +63,12 @@ def run_bot(
         application.add_handler(h)
 
     schedule_jobs(application)
-    log.info("Starting PTB long polling. owner_ids=%s", s.owner_id_list)
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    log.info(
+        "Starting PTB long polling. owner_ids=%s plugin_package=%s",
+        s.owner_id_list,
+        plugin_package if isinstance(plugin_package, str) else getattr(plugin_package, "__name__", None),
+    )
+    application.run_polling(
+        allowed_updates=Update.ALL_TYPES,
+        timeout=s.polling_timeout_sec,
+    )

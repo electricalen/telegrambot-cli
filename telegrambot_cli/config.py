@@ -51,6 +51,18 @@ class Settings(BaseSettings):
             return v.strip()
         raise ValueError("owner_ids must be a comma-separated string, int, or list")
 
+    @field_validator("owner_ids")
+    @classmethod
+    def validate_owner_ids(cls, v: str) -> str:
+        parts = [part.strip() for part in v.split(",") if part.strip()]
+        if not parts:
+            raise ValueError("owner_ids must contain at least one Telegram user ID")
+        try:
+            normalized = [str(int(part)) for part in parts]
+        except ValueError as exc:
+            raise ValueError("owner_ids must contain integers only") from exc
+        return ",".join(normalized)
+
     @computed_field
     @property
     def owner_id_list(self) -> List[int]:

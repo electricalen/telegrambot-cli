@@ -1,27 +1,36 @@
-# Sample bot (`telegrambot-cli`)
+# Sample App
 
-Minimal application that depends on the **`telegrambot-cli`** library from the repo root.
+This example shows the intended project shape for a bot built on `telegrambot-cli`. It keeps the application code thin and pushes the reusable framework concerns into the package at the repository root.
 
 ## Run
 
-From this directory:
+From `examples/sample_app/`:
 
 ```bash
 cp ../../.env.example .env
-# edit .env — same TELEGRAM_* variables as the main docs
-
 uv sync
 uv run sample-telegram-bot
 ```
 
-Or: `uv run python -m sample_app`.
+You can also start it with:
+
+```bash
+uv run python -m sample_app
+```
+
+## Included Commands
+
+- `ping`
+- `echo text`
+- `time tz=Europe/Madrid`
 
 ## Layout
 
-| Path | Role |
+| Path | Purpose |
 | --- | --- |
-| `sample_app/__main__.py` | Calls `run_bot(plugin_package=..., pre_import_modules=...)` |
-| `sample_app/plugins/` | One module per command (`register` + `@telegram_command`) |
-| `sample_app/monitors.py` | Optional `@register_monitor` hooks (imported for side effects) |
+| `sample_app/__main__.py` | Entrypoint that calls `run_bot(...)` |
+| `sample_app/plugins/` | Command modules loaded through plugin discovery |
+| `sample_app/plugins/_template.py` | Starter template for a new command |
+| `sample_app/monitors.py` | Optional monitor module imported for side effects |
 
-Copy `_template.py` in `plugins/` to add commands.
+The sample is intentionally small, but it demonstrates the contract expected by the framework: explicit command registration, typed arguments, and startup-driven monitor loading.
